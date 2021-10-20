@@ -18,13 +18,43 @@ class AuthController extends Controller
         }
         $client = new Client();
         try {
-            return $client->post('http://localhost:8000/v1/oauth/token', [
-                "form_params" => [
-                    "client_secret" => "ntBy1J1SIwkTPeWSU5PS7u05oEQYyHIR47oE2uT0",
-                    "grant_type" => "password",
-                    "client_id" => 2,
-                    "username" => $request->email,
-                    "password" => $request->password,
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+            CURLOPT_URL => 'localhost:8000/v1/oauth/token',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => array(
+                'client_secret' => 'ntBy1J1SIwkTPeWSU5PS7u05oEQYyHIR47oE2uT0',
+                'grant_type' => 'password',
+                'client_id' => 2,
+                'username' => $request->email,
+                'password' => $request->password
+            ),
+            ));
+
+            $response = curl_exec($curl);
+
+            curl_close($curl);
+            return $response;die;
+            $client   = new \GuzzleHttp\Client();
+            $response = $client->get('localhost:8000/api/posts');
+            return $response;die;
+            return $client->request('GET', 'localhost:8000/api/posts', ['debug' => true ]);die;
+            return $client->request('POST', 'localhost:8000/v1/oauth/token', [
+                'form_params' => [
+                    'client_secret' => 'ntBy1J1SIwkTPeWSU5PS7u05oEQYyHIR47oE2uT0',
+                    'grant_type' => 'password',
+                    'client_id' => 2,
+                    'username' => $request->email,
+                    'password' => $request->password
+                ],[
+                    'debug' => true,
+                    'connect_timeout' => 3.14
                 ]
             ]);
         } catch (BadResponseException $e) {
